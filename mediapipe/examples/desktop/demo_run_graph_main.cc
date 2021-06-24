@@ -32,11 +32,14 @@
 #include "mediapipe/framework/port/opencv_video_inc.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
+#include "mediapipe/framework/formats/detection.pb.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
+#include "mediapipe/framework/formats/rect.pb.h"
 
 constexpr char kInputStream[] = "input_video";
 constexpr char kOutputStream[] = "output_video";
 constexpr char kWindowName[] = "MediaPipe";
+constexpr char kOutputDetections[] = "output_detections";
 constexpr char kOutputLandmarks[] = "output_landmarks";
 //constexpr char kOutputPresence[] = "output_presence";
 
@@ -96,6 +99,8 @@ absl::Status RunMPPGraph() {
   LOG(INFO) << "Start running the calculator graph.";
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
                    graph.AddOutputStreamPoller(kOutputStream));
+  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller_detections,
+                       graph.AddOutputStreamPoller(kOutputDetections));
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller_landmarks,
                    graph.AddOutputStreamPoller(kOutputLandmarks));
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller_presence,
@@ -116,7 +121,7 @@ absl::Status RunMPPGraph() {
     int counts = capture.get(CV_CAP_PROP_FRAME_COUNT);
     // fps
     double fps = capture.get(CV_CAP_PROP_FPS);
-    ofs << W << ", "<< H << ", "<< counts << ", "<<　fps << endl;
+    ofs << "画面サイズ(W,H)，総フレーム数，fps"<<", "<< W << ", "<< H << ", "<< counts << ", "<<　fps << endl;
     
   while (grab_frames) {
       count += 1;
@@ -155,36 +160,43 @@ absl::Status RunMPPGraph() {
     // Get the graph result packet, or stop if that fails.
     mediapipe::Packet packet;
     mediapipe::Packet packet_presence;
+    mediapipe::Packet packet_detections;
     mediapipe::Packet packet_landmarks;
     
     if (!poller.Next(&packet)) break;
       // check whether the packet exists
     if (!poller_presence.Next(&packet_presence)) break;
     auto is_landmark_present = packet_presence.Get<bool>();
-      LOG(INFO) << count << is_landmark_present;
+      LOG(INFO) <<"Frame: "<< count <<", "<<"Presence(N=0,Y=1): "<< is_landmark_present;
       ofs << "Frame" << ", "<<　count << ", "<< "Presence" << ", "<<　is_landmark_present << endl;
     if (is_landmark_present) {
        // fetch landmarks only when they exist
        // if (poller_landmarks.Next(&packet_landmarks)) {
-        if (!poller_landmarks.Next(&packet_landmarks)) break;
+        if (!poller_landmarks.Next(&packet_landmarks) ) break;
               // do something
 //            }
   //        }
     auto &output_frame = packet.Get<mediapipe::ImageFrame>();
     auto &output_landmarks = packet_landmarks.Get<std::vector<mediapipe::NormalizedLandmarkList>>();
+   // auto &output_detections = packet_detections.Get<std::vector<mediapipe::Detection>>();
       
     //add
     LOG(INFO) << "#Multi Hand landmarks: " << output_landmarks.size();
+   // LOG(INFO) << "#Multi Hand detections: " << output_detections.size();
     int hand_id = 0;
     for (const auto& single_hand_landmarks: output_landmarks) {
+    
+        //std::cout << output_detections[hand_id].DebugString();
         ++hand_id;
         LOG(INFO) << "Hand [" << hand_id << "]:";
         for (int i = 0; i < single_hand_landmarks.landmark_size(); ++i) {
           const auto& landmark = single_hand_landmarks.landmark(i);
-         // LOG(INFO) << "\tLandmark [" << i << "]: ("
-          //          << landmark.x() << ", "
-           //         << landmark.y() << ", "
-            //        << landmark.z() << ")";
+        //  LOG(INFO) << "\tLandmark [" << i << "]: ("
+         //          << landmark.x() << ", "
+          //         << landmark.y() << ", "
+          //  << landmark.z() << ")";
+           // LOG(INFO)   << landmark.visibility() ;
+            //LOG(INFO)   << landmark.presence() << ")";
             ofs << hand_id << ", "<< i << ", "<< landmark.x()*W << ", "<< (1-landmark.y())*H << ", "<< landmark.z()*W << ", "<< endl;
         }
       }
