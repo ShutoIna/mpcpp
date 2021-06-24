@@ -182,8 +182,8 @@ the MediaPipe Stack Overflow with a `mediapipe` tag.
 
 ### 方法
 
-まずは，このリポジトリをクローンして下さい
-その後，ディレクトリmpcpptestに移動して，
+まずは，このリポジトリをクローンして下さい  
+その後，ディレクトリ'mpcpp'に移動して，
 
 ```
 bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/hand_tracking:hand_tracking_cpu
@@ -200,5 +200,5 @@ GLOG_logtostderr=1 bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_track
 「IDを入力して下さい ↓」という指示があるので，  
 適当な整数を入力すると，手座標の取得が始まります．  
 
-計算が完了すると，'ID名.csv'がディレクトリmpcpptestに生成されます
+計算が完了すると，'ID名.csv'がディレクトリ'mpcpp'に生成されます
 
