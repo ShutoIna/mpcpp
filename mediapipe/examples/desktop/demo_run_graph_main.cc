@@ -161,7 +161,7 @@ absl::Status RunMPPGraph() {
       // check whether the packet exists
     if (!poller_presence.Next(&packet_presence)) break;
     auto is_landmark_present = packet_presence.Get<bool>();
-      LOG(INFO) << is_landmark_present;
+      LOG(INFO) << count << is_landmark_present;
       ofs << "Frame" << ", "<<　count << ", "<< "Presence" << ", "<<　is_landmark_present << endl;
     if (is_landmark_present) {
        // fetch landmarks only when they exist
@@ -181,10 +181,10 @@ absl::Status RunMPPGraph() {
         LOG(INFO) << "Hand [" << hand_id << "]:";
         for (int i = 0; i < single_hand_landmarks.landmark_size(); ++i) {
           const auto& landmark = single_hand_landmarks.landmark(i);
-          LOG(INFO) << "\tLandmark [" << i << "]: ("
-                    << landmark.x() << ", "
-                    << landmark.y() << ", "
-                    << landmark.z() << ")";
+         // LOG(INFO) << "\tLandmark [" << i << "]: ("
+          //          << landmark.x() << ", "
+           //         << landmark.y() << ", "
+            //        << landmark.z() << ")";
             ofs << hand_id << ", "<< i << ", "<< landmark.x()*W << ", "<< (1-landmark.y())*H << ", "<< landmark.z()*W << ", "<< endl;
         }
       }
