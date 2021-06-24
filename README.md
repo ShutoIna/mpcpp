@@ -171,3 +171,32 @@ We welcome contributions. Please follow these
 
 We use GitHub issues for tracking requests and bugs. Please post questions to
 the MediaPipe Stack Overflow with a `mediapipe` tag.
+
+
+
+## ＊稲垣による実装方法
+
+このコードで，手の座標を検出するコードを作成しました．
+
+### 方法
+
+まずは，このリポジトリをクローンして下さい
+その後，ディレクトリmpcpptestに移動して，
+
+```
+$ bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/hand_tracking:hand_tracking_cpu
+
+```
+
+```
+$ GLOG_logtostderr=1 bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_cpu --calculator_graph_config_file=mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt --input_video_path=(入力動画のパス) --output_video_path=(出力動画のパス)
+
+```
+
+と入力すると，
+
+「IDを入力して下さい ↓」という指示があるので，  
+適当な整数を入力すると，手座標の取得が始まります．  
+
+計算が完了すると，'ID名.csv'がディレクトリmpcpptestに生成されます
+
