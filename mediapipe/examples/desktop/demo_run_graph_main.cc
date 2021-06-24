@@ -87,7 +87,11 @@ absl::Status RunMPPGraph() {
     //csv出力
        using std::endl;
        using std::ofstream;
-       ofstream ofs("test_hand.csv");
+    int a;
+    std::cout << "IDを入力して下さい ↓ " << std::endl;
+    std::cin >> a;
+    ofstream ofs(std::to_string(a)+".csv");
+     
 
   LOG(INFO) << "Start running the calculator graph.";
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
